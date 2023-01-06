@@ -36,7 +36,6 @@ const FileForm = () => {
 			});
 			const body = await response.json();
 
-			console.log(body);
 			setBooks(body.fileContent);
 			window.open(`https://localhost:7107/api/files/${body.fileId}`, '_blank');
 		} catch (err) {
