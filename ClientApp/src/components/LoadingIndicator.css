@@ -1,0 +1,24 @@
+.loading-indicator {
+    position: relative;
+}
+
+.loading-content {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top:0;
+    left: 0;
+    display: flex;
+    text-align: center;
+    font-size: 1.2em;
+    color: #fff;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 1000;
+    transition: opacity 300ms ease-in;
+    opacity: 0.65;
+    background: #fff;
+}
+
+.spinner-wrap {
+    margin: auto;
+}
