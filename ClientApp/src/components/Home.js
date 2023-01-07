@@ -5,7 +5,7 @@ import BookList from './BookList';
 const Home = () => {
 	return (
 		<>
-			<h1>Books Information</h1>
+			<h2>Books Information</h2>
 			<div className="row">
 				<div className="col-12">
 					<p>Input a file to get the books information.</p>
