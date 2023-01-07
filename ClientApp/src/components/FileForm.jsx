@@ -15,6 +15,7 @@ const isSuportedFile = (file) => {
 
 const FileForm = () => {
 	const { setBooks } = useContext(BookContext);
+	const [error, setError] = useState();
 	const {
 		formState: { errors },
 		handleSubmit,
@@ -24,10 +25,10 @@ const FileForm = () => {
 
 	const onSubmit = async (data) => {
 		setIsUploading(true);
-		const { bookInfoFile } = data;
+		const { fileInput } = data;
 
 		const payload = new FormData();
-		payload.append('file', bookInfoFile[0]);
+		payload.append('file', fileInput[0]);
 
 		try {
 			const response = await fetch('https://localhost:7107/api/files', {
@@ -35,9 +36,15 @@ const FileForm = () => {
 				body: payload,
 			});
 			const body = await response.json();
-
-			setBooks(body.fileContent);
-			window.open(`https://localhost:7107/api/files/${body.fileId}`, '_blank');
+			if (response.ok) {
+				setBooks(body.fileContent);
+				window.open(
+					`https://localhost:7107/api/files/${body.fileId}`,
+					'_blank'
+				);
+			} else {
+				setError(body.message);
+			}
 		} catch (err) {
 		} finally {
 			setIsUploading(false);
@@ -45,44 +52,64 @@ const FileForm = () => {
 	};
 
 	return (
-		<LoadingIndicator isLoading={isUploading}>
-			<form onSubmit={handleSubmit(onSubmit)}>
-				<div className="mb-3">
-					<label htmlFor="fileInput" className="form-label">
-						Select a file to upload
-					</label>
-					<input
-						type="file"
-						className={`form-control ${
-							errors.bookInfoFile ? 'is-invalid' : ''
-						}`}
-						id="fileInput"
-						aria-describedby="fileHelper"
-						accept=".txt"
-						{...register('bookInfoFile', {
-							required: 'The file is required.',
-							validate: {
-								isSupportedExtension: (fileArr) =>
-									fileArr && isSuportedFile(fileArr[0])
-										? true
-										: `The file is not supported, supported files are: ${supportedFiles}`,
-							},
-						})}
-					/>
-					{!errors.bookInfoFile && (
-						<div id="fileHelper" className="form-text">
-							We only support .txt files.
-						</div>
-					)}
-					<div className="invalid-feedback">
-						{errors?.bookInfoFile?.message}
-					</div>
+		<>
+			{error && (
+				<div
+					className="alert alert-danger alert-dismissible fade show"
+					role="alert"
+				>
+					{error || 'An error has occurred when uploading the file.'}
+					<button
+						type="button"
+						className="btn-close"
+						data-bs-dismiss="alert"
+						aria-label="Close"
+						onClick={() => setError(null)}
+					></button>
 				</div>
-				<button type="submit" className="btn btn-primary">
-					Submit
-				</button>
-			</form>
-		</LoadingIndicator>
+			)}
+			<LoadingIndicator isLoading={isUploading}>
+				<form onSubmit={handleSubmit(onSubmit)}>
+					<div class="row g-3">
+						<div class="col-10">
+							<input
+								type="file"
+								className={`form-control ${
+									errors.fileInput ? 'is-invalid' : ''
+								}`}
+								id="fileInput"
+								aria-describedby="fileHelper"
+								accept=".txt"
+								{...register('fileInput', {
+									required: 'The file is required.',
+									validate: {
+										isSupportedExtension: (fileArr) =>
+											fileArr && isSuportedFile(fileArr[0])
+												? true
+												: `The file is not supported, supported files are: ${supportedFiles}`,
+									},
+								})}
+							/>
+							{!errors.fileInput && (
+								<div id="fileHelper" className="form-text">
+									We only support .txt files.
+								</div>
+							)}
+							<div className="invalid-feedback">
+								{errors?.fileInput?.message}
+							</div>
+						</div>
+						<div class="col">
+							<div className="d-grid">
+								<button type="submit" className="btn btn-primary block">
+									Process File
+								</button>
+							</div>
+						</div>
+					</div>
+				</form>
+			</LoadingIndicator>
+		</>
 	);
 };
 
