@@ -1,5 +1,6 @@
 using System.Reflection;
 using Books.Extensions;
+using Books.Filters;
 using Books.Models;
 using Books.Services;
 
@@ -7,7 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllersWithViews();
 
 // Add caching
 builder.Services.AddMemoryCache();
@@ -23,6 +23,11 @@ builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 // getting books api config
 var bookConfig = builder.Configuration.GetSection(nameof(BookApiConfig)).Get<BookApiConfig>();
 builder.Services.AddSingleton(bookConfig);
+
+builder.Services.AddControllersWithViews(config =>
+{
+    config.Filters.Add(typeof(ExceptionFilter));
+});
 
 var app = builder.Build();
 
